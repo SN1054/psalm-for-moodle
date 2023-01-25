@@ -1,5 +1,5 @@
 {
-    "name": "SN1054/psalm-moodle",
+    "name": "sn1054/psalm-for-moodle",
     "type": "library",
     "description": "A fork of vimeo/psalm for Moodle",
     "keywords": [
