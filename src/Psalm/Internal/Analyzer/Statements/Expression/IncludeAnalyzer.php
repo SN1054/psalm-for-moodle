@@ -301,6 +301,26 @@ class IncludeAnalyzer
             return $stmt->value;
         }
 
+        //handles require_once("$CFG->libdir/externallib.php");
+        if ($stmt instanceof PhpParser\Node\Scalar\EncapsedStringPart) {
+            if (DIRECTORY_SEPARATOR !== '/') {
+                return str_replace('/', DIRECTORY_SEPARATOR, $stmt->value);
+            }
+            return $stmt->value;
+        }
+        if ($stmt instanceof PhpParser\Node\Scalar\Encapsed) {
+            $path = '';
+            foreach ($stmt->parts as $part) {
+                $result = self::getPathTo($part, $type_provider, $statements_analyzer, $file_name, $config);
+                if (!isset($result)) {
+                    return null;
+                }
+                $path .= $result;
+            }
+
+            return $path;
+        }
+
         $stmt_type = $type_provider ? $type_provider->getType($stmt) : null;
 
         if ($stmt_type && $stmt_type->isSingleStringLiteral()) {
@@ -324,6 +344,16 @@ class IncludeAnalyzer
                     /** @var string */
                     return $GLOBALS[$stmt->dim->value];
                 }
+            }
+            // handles require_once($CFG->dirroot . "/cohort/lib.php");
+        } elseif ($stmt instanceof PhpParser\Node\Expr\PropertyFetch) {
+            if ($stmt->var instanceof PhpParser\Node\Expr\Variable
+                && isset($GLOBALS[$stmt->var->name])
+                && is_object($GLOBALS[$stmt->var->name])
+                && isset($GLOBALS[$stmt->var->name]->{$stmt->name->name})
+                && is_string($GLOBALS[$stmt->var->name]->{$stmt->name->name})
+            ) {
+                return $GLOBALS[$stmt->var->name]->{$stmt->name->name};
             }
         } elseif ($stmt instanceof PhpParser\Node\Expr\BinaryOp\Concat) {
             $left_string = self::getPathTo($stmt->left, $type_provider, $statements_analyzer, $file_name, $config);
