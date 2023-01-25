@@ -1,7 +1,7 @@
 {
-    "name": "vimeo/psalm",
+    "name": "SN1054/psalm-moodle",
     "type": "library",
-    "description": "A static analysis tool for finding errors in PHP applications",
+    "description": "A fork of vimeo/psalm for Moodle",
     "keywords": [
         "php",
         "code",
