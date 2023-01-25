@@ -205,6 +205,8 @@ class ConstFetchAnalyzer
             $fq_const_name = $aliased_constants[$const_name];
         } elseif ($is_fully_qualified) {
             $fq_const_name = $const_name;
+        } elseif (defined($const_name)) {
+            $fq_const_name = '\\' . $const_name;
         } else {
             $fq_const_name = Type::getFQCLNFromString($const_name, $statements_analyzer->getAliases());
         }
